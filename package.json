@@ -3,11 +3,12 @@
 	"version": "0.0.1", 
 	"dependencies": {
 		"socket.io": ">=0.9.4", 
-		"crc": ">=0.0.1"
+		"crc": ">=0.0.1", 
+		"socket.io-client": ">=0.9.4", 
+		"pomelo-loader": ">=0.0.1"
 	}, 
 	"devDependencies": {
 		"mocha": ">=0.0.1", 
-		"should": ">=0.0.1", 
-		"socket.io-client": ">=0.9.4"
+		"should": ">=0.0.1"
 	}
 }

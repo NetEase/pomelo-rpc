@@ -24,7 +24,7 @@ B.prototype.addA = function() {
 	this.a.value++;
 };
 
-var callback = function(namespace, method, args, attach, invoke) {
+var callback = function(service, method, args, attach, invoke) {
 	
 };
 

@@ -2,7 +2,7 @@ var MailStation = require('../../lib/rpc-client/mailstation');
 var should = require('should');
 var Server = require('../../lib/rpc-server/server');
 
-var WAIT_TIME = 30;
+var WAIT_TIME = 50;
 
 var paths = [
 	{namespace: 'user', serverType: 'area', path: __dirname + '../../mock-remote/area'}, 
@@ -90,6 +90,57 @@ describe('mail station', function() {
 				done();
 			});
 		});
+
+		it('should change the default mailbox by pass the mailboxFactory to the create function', function(done) {
+			var constructCount = 0, connectCount = 0, closeCount = 0, startCount = 0;
+
+			var MockMailbox = function(opts, cb) {
+				constructCount++;
+			};
+
+			MockMailbox.prototype.connect = function(cb) {
+				connectCount++;
+				cb();
+			};
+
+			MockMailbox.prototype.close = function(force) {
+				closeCount++;
+			};
+
+			MockMailbox.prototype.on = function() {};
+
+			MockMailbox.prototype.emit = function() {};
+
+			var mailboxFactory = {
+				create: function(opts, cb) {
+					return new MockMailbox(null, cb);
+				}
+			};
+
+			var opts = {
+				paths: paths, 
+				servers: servers, 
+				mailboxFactory: mailboxFactory
+			};
+
+			var station = MailStation.create(opts);
+			
+			should.exist(station);
+			
+			station.start(function(err) {
+				should.not.exist(err);
+				startCount++;
+				station.stop(true);
+			});
+			
+			setTimeout(function() {
+				constructCount.should.equal(3);
+				connectCount.should.equal(3);
+				closeCount.should.equal(3);
+				startCount.should.equal(1);
+				done();
+			}, WAIT_TIME);
+		});
 	});
 	
 	describe('#dispatch', function() {
@@ -166,7 +217,7 @@ describe('mail station', function() {
 					for(var i=0; i<configs.length; i++) {
 						count++;
 						station.dispatch(configs[i].id, msg, null, function(err, remoteId, attach) {
-							should.exist(err)
+							should.exist(err);
 							errorEventCount++;
 						});
 					}

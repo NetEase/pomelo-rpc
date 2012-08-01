@@ -55,7 +55,7 @@ describe('server', function() {
 				listenCount++;
 			};
 
-			MockAcceptor.prototype.close = function(grace) {
+			MockAcceptor.prototype.close = function() {
 				closeCount++;
 			};
 
