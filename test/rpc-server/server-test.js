@@ -2,7 +2,7 @@ var Server = require('../../lib/rpc-server/server');
 var should = require('should');
 var Client = require('./client/mock-client');
 
-var WAIT_TIME = 20;
+var WAIT_TIME = 100;
 
 var paths = [
 	{namespace: 'user', serverType: 'area', path: __dirname + '../../mock-remote/area'}, 

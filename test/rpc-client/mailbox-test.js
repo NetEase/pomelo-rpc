@@ -2,7 +2,7 @@ var Mailbox = require('../../lib/rpc-client/mailboxes/ws-mailbox');
 var should = require('should');
 var Server = require('../../lib/rpc-server/server');
 
-var WAIT_TIME = 30;
+var WAIT_TIME = 100;
 
 var paths = [
 	{namespace: 'user', serverType: 'area', path: __dirname + '../../mock-remote/area'}, 
@@ -11,7 +11,7 @@ var paths = [
 
 var port = 3333;
 
-var opts = {
+var server = {
 	id: 'area-server-1', 
 	host: '127.0.0.1', 
 	port: port
@@ -33,7 +33,9 @@ describe('mailbox', function() {
 		//start remote server
 		var opts = {
 			paths: paths, 
-			port: port
+			port: port, 
+			cacheMsg: true, 
+			interval: 30
 		};
 
 		gateway = Server.create(opts);
@@ -49,7 +51,7 @@ describe('mailbox', function() {
 	
 	describe('#create', function() {
 		it('should be ok for creating a mailbox and connect to the right remote server', function(done) {
-			var mailbox = Mailbox.create(opts);
+			var mailbox = Mailbox.create(server);
 			should.exist(mailbox);
 			mailbox.connect(function(err) {
 				should.not.exist(err);
@@ -59,13 +61,13 @@ describe('mailbox', function() {
 		}); 
 		
 		it('should return an error if connect fail', function(done) {
-			var opts = {
-					id: "area-server-1", 
-					host: "127.0.0.1", 
-					port: 1234	//invalid port
+			var server = {
+				id: "area-server-1", 
+				host: "127.0.0.1", 
+				port: -1000	//invalid port
 			};
 			
-			var mailbox = Mailbox.create(opts);
+			var mailbox = Mailbox.create(server);
 			should.exist(mailbox);
 			mailbox.connect(function(err) {
 				should.exist(err);
@@ -76,7 +78,7 @@ describe('mailbox', function() {
 	
 	describe('#send', function() {
 		it('should send request to remote server and get the response from callback function', function(done) {
-			var mailbox = Mailbox.create(opts);
+			var mailbox = Mailbox.create(server);
 			mailbox.connect(function(err) {
 				should.not.exist(err);
 
@@ -89,7 +91,7 @@ describe('mailbox', function() {
 			});
 		});
 		
-		it('should distinguish different level services and keep the right request/response relationship', function(done) {
+		it('should distinguish different services and keep the right request/response relationship', function(done) {
 			var value = 1;
 			var msg1 = {
 				namespace: 'user', 
@@ -114,7 +116,7 @@ describe('mailbox', function() {
 			};
 			var callbackCount = 0;
 
-			var mailbox = Mailbox.create(opts);
+			var mailbox = Mailbox.create(server);
 			mailbox.connect(function(err) {
 				should.not.exist(err);
 
@@ -145,12 +147,136 @@ describe('mailbox', function() {
 				done();
 			}, WAIT_TIME);
 		});
+
+		it('should distinguish different services and keep the right request/response relationship when use message cache mode', function(done) {
+			var value = 1;
+			var msg1 = {
+				namespace: 'user', 
+				serverType: 'area', 
+				service: 'addOneRemote', 
+				method: 'doService', 
+				args: [value]
+			};
+			var msg2 = {
+				namespace: 'user', 
+				serverType: 'area', 
+				service: 'addOneRemote', 
+				method: 'doAddTwo', 
+				args: [value]
+			};
+			var msg3 = {
+				namespace: 'user', 
+				serverType: 'area', 
+				service: 'addThreeRemote', 
+				method: 'doService', 
+				args: [value]
+			};
+			var callbackCount = 0;
+
+			var mailbox = Mailbox.create(server, {cacheMsg: true});
+			mailbox.connect(function(err) {
+				should.not.exist(err);
+
+				mailbox.send(msg1, null, function(err, res) {
+					should.exist(res);
+					res.should.equal(value + 1);
+					callbackCount++;
+				});
+				
+				mailbox.send(msg2, null, function(err, res) {
+					should.exist(res);
+					res.should.equal(value + 2);
+					callbackCount++;
+				});
+
+				mailbox.send(msg3, null, function(err, res) {
+					should.exist(res);
+					res.should.equal(value + 3);
+					callbackCount++;
+				});
+			});
+			
+			setTimeout(function() {
+				callbackCount.should.equal(3);
+				if(!!mailbox) {
+					mailbox.close();
+				}
+				done();
+			}, WAIT_TIME);
+		});
+
+		it('should distinguish different services and keep the right request/response relationship if the client uses message cache mode but server not', function(done) {
+			//start a new remote server without message cache mode
+			var opts = {
+				paths: paths, 
+				port: 3051
+			};
+
+			var gateway = Server.create(opts);
+			gateway.start();
+
+			var value = 1;
+			var msg1 = {
+				namespace: 'user', 
+				serverType: 'area', 
+				service: 'addOneRemote', 
+				method: 'doService', 
+				args: [value]
+			};
+			var msg2 = {
+				namespace: 'user', 
+				serverType: 'area', 
+				service: 'addOneRemote', 
+				method: 'doAddTwo', 
+				args: [value]
+			};
+			var msg3 = {
+				namespace: 'user', 
+				serverType: 'area', 
+				service: 'addThreeRemote', 
+				method: 'doService', 
+				args: [value]
+			};
+			var callbackCount = 0;
+
+			var mailbox = Mailbox.create(server, {cacheMsg: true});
+			mailbox.connect(function(err) {
+				should.not.exist(err);
+
+				mailbox.send(msg1, null, function(err, res) {
+					should.exist(res);
+					res.should.equal(value + 1);
+					callbackCount++;
+				});
+				
+				mailbox.send(msg2, null, function(err, res) {
+					should.exist(res);
+					res.should.equal(value + 2);
+					callbackCount++;
+				});
+
+				mailbox.send(msg3, null, function(err, res) {
+					should.exist(res);
+					res.should.equal(value + 3);
+					callbackCount++;
+				});
+			});
+			
+			setTimeout(function() {
+				callbackCount.should.equal(3);
+				if(!!mailbox) {
+					mailbox.close();
+				}
+				gateway.stop();
+				done();
+			}, WAIT_TIME);
+		});
 	});
 	
 	describe('#close', function() {
 		it('should emit a close event when mailbox close', function(done) {
 			var closeEventCount = 0;
-			var mailbox = Mailbox.create(opts);
+			var mailbox = Mailbox.create(server);
 			mailbox.connect(function(err) {
 				should.not.exist(err);
 				mailbox.on('close', function() {
@@ -166,7 +292,7 @@ describe('mailbox', function() {
 		});
 		
 		it('should return an error when try to send message by a closed mailbox', function(done) {
-			var mailbox = Mailbox.create(opts);
+			var mailbox = Mailbox.create(server);
 			mailbox.connect(function(err) {
 				should.not.exist(err);
 				mailbox.close();

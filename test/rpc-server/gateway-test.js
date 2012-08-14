@@ -2,7 +2,7 @@ var Gateway = require('../../lib/rpc-server/gateway');
 var should = require('should');
 var Client = require('./client/mock-client');
 
-var WAIT_TIME = 20;
+var WAIT_TIME = 100;
 
 var services = {
 	user: {

@@ -2,7 +2,7 @@ var Acceptor = require('../../lib/rpc-server/acceptor');
 var should = require('should');
 var Client = require('./client/mock-client');
 
-var WAIT_TIME = 20;
+var WAIT_TIME = 100;
 
 var port = 3333;
 
