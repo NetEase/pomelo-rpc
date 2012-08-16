@@ -248,7 +248,7 @@ describe('mail station', function() {
 					fmsg.should.equal(msg);
 					fopts.should.equal(orgOpts);
 					preFilterCount++;
-					next();
+					next(fsid, fmsg, fopts);
 				});
 				
 				station.before(function(fsid, fmsg, fopts, next) {
@@ -258,7 +258,7 @@ describe('mail station', function() {
 					fmsg.should.equal(msg);
 					fopts.should.equal(orgOpts);
 					preFilterCount++;
-					next();
+					next(fsid, fmsg, fopts);
 				});
 				
 				station.after(function(fsid, fmsg, fopts, next) {
@@ -268,7 +268,7 @@ describe('mail station', function() {
 					fmsg.should.equal(msg);
 					fopts.should.equal(orgOpts);
 					afterFilterCount++;
-					next();
+					next(fsid, fmsg, fopts);
 				});
 				
 				station.after(function(fsid, fmsg, fopts, next) {
@@ -278,7 +278,7 @@ describe('mail station', function() {
 					fmsg.should.equal(msg);
 					fopts.should.equal(orgOpts);
 					afterFilterCount++;
-					next();
+					next(fsid, fmsg, fopts);
 				});
 				
 				station.dispatch(sid, orgMsg, orgOpts, function() {});
