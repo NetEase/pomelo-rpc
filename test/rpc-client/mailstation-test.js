@@ -171,6 +171,77 @@ describe('mail station', function() {
 				done();
 			}, WAIT_TIME);
 		});
+
+		it('should send request to the right remote server and get the response from callback function in lazy connect mode', function(done) {
+			var opts = {
+				servers: servers, 
+				lazyConnect: true
+			};
+			var callbackCount = 0;
+			var count = 0;
+			var station = MailStation.create(opts);
+			should.exist(station);
+
+			station.start(function(err) {
+				should.exist(station);
+				for(var type in servers) {
+					var configs = servers[type];
+					for(var i=0; i<configs.length; i++) {
+						count++;
+						station.dispatch(configs[i].id, msg, null, (function(id) {
+							return function(err, remoteId) {
+								remoteId.should.equal(id);
+								callbackCount++;
+							};
+						})(configs[i].id));
+					}
+				}
+			});
+			setTimeout(function() {
+				callbackCount.should.equal(count);
+				station.stop();
+				done();
+			}, WAIT_TIME);
+		});
+
+		it('should emit error info and forward message to blackhole if fail to connect to remote server in lazy connect mode', function(done) {
+			// mock data
+			var serverId = 'invalid-server-id';
+			var servers = {
+				'invalid-server': [
+					{id: serverId, host: 'localhost', port: 1234}
+				]
+			};
+			var opts = {
+				servers: servers, 
+				lazyConnect: true
+			};
+			var callbackCount = 0;
+			var eventCount = 0;
+			var station = MailStation.create(opts);
+			should.exist(station);
+
+			station.on('error', function(err) {
+				should.exist(err);
+				('fail to connect to remote server: ' + serverId).should.equal(err.message);
+				eventCount++;
+			});
+
+			station.start(function(err) {
+				should.exist(station);
+				station.dispatch(serverId, msg, null, function(err) {
+					should.exist(err);
+					'message was forward to blackhole.'.should.equal(err.message);
+					callbackCount++;
+				});
+			});
+			setTimeout(function() {
+				eventCount.should.equal(1);
+				callbackCount.should.equal(1);
+				station.stop();
+				done();
+			}, WAIT_TIME);
+		});
 	});
 	
 	describe('#close', function() {
