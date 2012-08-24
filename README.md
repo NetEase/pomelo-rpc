@@ -16,6 +16,7 @@ npm install pomelo-rpc
 ``` javascript
 var Server = require('pomelo-rpc').server;
 
+// remote service path info list
 var paths = [
   {namespace: 'user', path: __dirname + '../../mock-remote/area'}, 
   {namespace: 'sys', path: __dirname + '../../mock-remote/connector'}
@@ -31,11 +32,13 @@ console.log('rpc server started.');
 ``` javascript
 var Client = require('pomelo-rpc').client;
 
+// remote service interface path info list
 var paths = [
   {namespace: 'user', serverType: 'area', path: __dirname + '../../mock-remote/area'}, 
   {namespace: 'sys', serverType: 'connector', path: __dirname + '../../mock-remote/connector'}
 ];
 
+// global server info list
 var servers = {
   'area': [
     {id: 'area-servere-1', host: '127.0.0.1',  port: 3333}
