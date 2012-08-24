@@ -1,10 +1,12 @@
-#pomelo-rpc
+#pomelo-rpc - rpc framework for pomelo
 pomelo-rpc是pomelo项目底层的rpc框架，提供了一个多服务器进程间进行rpc调用的基础设施。
 pomelo-rpc分为客户端和服务器端两个部分。
 客户端部分提供了rpc代理生成，消息路由和网络通讯等功能。
 服务器端提供了远程服务暴露，请求派发，网络通讯等功能。
 
 远程服务代码加载由pomelo-loader模块完成，相关规则可以参考https://github.com/node-pomelo/pomelo-loader
+
++ Tags: node.js
 
 ##安装
 ```
