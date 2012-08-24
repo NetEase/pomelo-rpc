@@ -4,6 +4,8 @@ pomelo-rpc分为客户端和服务器端两个部分。
 客户端部分提供了rpc代理生成，消息路由和网络通讯等功能。
 服务器端提供了远程服务暴露，请求派发，网络通讯等功能。
 
+远程服务代码加载由pomelo-loader模块完成，相关规则可以参考https://github.com/node-pomelo/pomelo-loader
+
 ##安装
 ```
 npm install pomelo-rpc
