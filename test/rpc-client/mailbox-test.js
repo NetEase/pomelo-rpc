@@ -1,4 +1,4 @@
-var Mailbox = require('../../lib/rpc-client/mailboxes/ws-mailbox');
+var Mailbox = require('../../lib/rpc-client/mailbox');
 var should = require('should');
 var Server = require('../../lib/rpc-server/server');
 
