@@ -89,7 +89,8 @@ client.start(function(err) {
 + opts.paths - 被代理的远程服务信息列表，结构：[{namespace: 代理的名字空间, serverType: 远程服务器的类型, path: 远程接口的目录}]。
 + opts.servers - 全局服务器信息，结构：{serverType: [{serverId: 服务器id, host: 服务器host, port: 服务器端口(, 其他属性...)}]}。
 + opts.context - 传递给mailbox的上下文信息。
-+ opts.router(routeParam, msg, cb) - （可选）rpc消息路由函数。
++ opts.routeContext - （可选）传递给router函数的上下文。
++ opts.router(routeParam, msg, routeContext, cb) - （可选）rpc消息路由函数。其中，routeParam是路由的相关的参数，对应于rpc代理第一个参数，可以通过这个参数传递请求用户的相关信息，如session; msg是rpc的描述消息; routeContext是opts.routeContext。
 + opts.mailBoxFactory(serverInfo, opts) - （可选）构建mailbox实例的工厂方法。
 
 ###client.start(cb)
