@@ -24,6 +24,10 @@ var opts = {services: services, port: port};
 
 describe('gateway', function() {
 	
+	after() {
+
+	};
+	
 	describe('#start', function() {
 		it('should be ok when listen a valid port and emit a closed event when it closed', function(done) {
 			var errorCount = 0;
