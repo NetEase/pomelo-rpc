@@ -66,7 +66,7 @@ Create a RPC server instance. Intitiate the instance and acceptor with the confi
 ###Parameters
 + opts.port - rpc server listening port.
 + opts.paths - remote service path infos, format: [{namespace: remote service namespace, path: remote service path}, ...].
-+ opts.context - remote service context。
++ opts.context - remote service context.
 + opts.acceptorFactory(opts, msgCB) - (optional) acceptor factory method. opts.port：port that acceptor would listen，opts.services：loaded remote services，format: {namespace: {name: service}}. msgCB(msg, cb): remote request arrived callback. the method should return a acceptor instance.
 
 ###server.start
@@ -88,8 +88,8 @@ Stop the acceptor.
 ###Client.create(opts)
 Create an RPC client instance which would generate proxies for the RPC client.
 ####Parameters
-+ opts.paths - remote service path infos, format: [{namespace: proxy namespace, serverType: remote server type, path: remote service path}]。
-+ opts.servers - global server infos, format: {serverType: [{serverId: server id, host: server host, port: server port}]}。
++ opts.paths - remote service path infos, format: [{namespace: proxy namespace, serverType: remote server type, path: remote service path}].
++ opts.servers - global server infos, format: {serverType: [{serverId: server id, host: server host, port: server port}]}.
 + opts.context - context for mailbox.
 + opts.routeContext - (optional)context for route function.
 + opts.router(routeParam, msg, routeContext, cb) - (optional) route function which decides the RPC message should be send to which remote server. routeParam: route parameter, msg: RPC descriptioin message, routeContext: opts.routeContext.
