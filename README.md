@@ -1,26 +1,28 @@
 #pomelo-rpc - rpc framework for pomelo
-pomelo-rpc是pomelo项目底层的rpc框架，提供了一个多服务器进程间进行rpc调用的基础设施。
-pomelo-rpc分为客户端和服务器端两个部分。
-客户端部分提供了rpc代理生成，消息路由和网络通讯等功能。
-服务器端提供了远程服务暴露，请求派发，网络通讯等功能。
 
-远程服务代码加载由pomelo-loader模块完成，相关规则可以参考https://github.com/node-pomelo/pomelo-loader
+pomelo-rpc is the low level RPC framework for pomelo project. It contains two parts: client and server.
+
+The client part generates the RPC client proxy, routes the message to the appropriate remote server and manages the network communications.
+
+The server part exports the remote services, dispatches the remote requests to the services and also manages the network communications.
+
+And the remote service codes would loaded by pomelo-loader module and more details please access this [link](https://github.com/node-pomelo/pomelo-loader).
 
 + Tags: node.js
 
-##安装
+##Installation
 ```
 npm install pomelo-rpc
 ```
 
-##用法
+##Usage
 ###Server
 ``` javascript
 var Server = require('pomelo-rpc').server;
 
 // remote service path info list
 var paths = [
-  {namespace: 'user', path: __dirname + '../../mock-remote/area'}, 
+  {namespace: 'user', path: __dirname + '../../mock-remote/area'},
   {namespace: 'sys', path: __dirname + '../../mock-remote/connector'}
 ];
 var port = 3333;
@@ -36,7 +38,7 @@ var Client = require('pomelo-rpc').client;
 
 // remote service interface path info list
 var paths = [
-  {namespace: 'user', serverType: 'area', path: __dirname + '../../mock-remote/area'}, 
+  {namespace: 'user', serverType: 'area', path: __dirname + '../../mock-remote/area'},
   {namespace: 'sys', serverType: 'connector', path: __dirname + '../../mock-remote/connector'}
 ];
 
@@ -44,80 +46,80 @@ var paths = [
 var servers = {
   'area': [
     {id: 'area-servere-1', host: '127.0.0.1',  port: 3333}
-  ], 
+  ],
   'connector': [
-    {id: 'connector-server-1', host: '127.0.0.1',  port: 4444}, 
+    {id: 'connector-server-1', host: '127.0.0.1',  port: 4444},
     {id: 'connector-server-2', host: '127.0.0.1',  port: 5555}
   ]
 };
 
 var client = Client.create({paths: paths, servers: servers}});
-      
+
 client.start(function(err) {
   console.log('rpc client start ok.');
 });
-``` 
+```
 
 ##Server API
 ###Server.create(opts)
-创建一个rpc server实例。根据配置信息加载远程服务代码，并生成底层acceptor。
-###参数
-+ opts.port - rpc server监听端口
-+ opts.paths - 远程服务信息列表, [{namespace: 远程服务名字空间, path: 远程服务代码目录}, ...].
-+ opts.context - 传递给远程服务的上下文信息。
-+ opts.acceptorFactory(opts, msgCB) - （可选）opts.port：监听的端口，opts.services：已加载的远程服务集合，结构为：{namespace: {name: service}}。msgCB(msg, cb)：消息到达回调。该方法返回返回值为acceptor实例。
+Create a RPC server instance. Intitiate the instance and acceptor with the configure.
+###Parameters
++ opts.port - rpc server listening port.
++ opts.paths - remote service path infos, format: [{namespace: remote service namespace, path: remote service path}, ...].
++ opts.context - remote service context。
++ opts.acceptorFactory(opts, msgCB) - (optional) acceptor factory method. opts.port：port that acceptor would listen，opts.services：loaded remote services，format: {namespace: {name: service}}. msgCB(msg, cb): remote request arrived callback. the method should return a acceptor instance.
 
 ###server.start
-启动rpc server实例。
+Start the remote server instance.
 
 ###server.stop
-停止rpc server实例，关闭底层的acceptor监听。
+Stop the remote server instance and the acceptor.
 
 ###Acceptor
-负责rpc server底层的监听和rpc协议的具体实现。可以通过传入acceptorFactory来定制自己的acceptor，从而实现不同的rpc协议和策略。
+Implement the low level network communication with specified protocol. Customize the protocol by passing an acceptorFactory to return different acceptors.
 
 ###acceptor.listen(port)
-让acceptor实例开始监听port端口。
+Listen the specified port.
 
 ###acceptor.close
-关闭acceptor实例。
+Stop the acceptor.
 
 ##Client API
 ###Client.create(opts)
-创建一个rpc client实例。根据配置生成代理。
-####参数
-+ opts.paths - 被代理的远程服务信息列表，结构：[{namespace: 代理的名字空间, serverType: 远程服务器的类型, path: 远程接口的目录}]。
-+ opts.servers - 全局服务器信息，结构：{serverType: [{serverId: 服务器id, host: 服务器host, port: 服务器端口(, 其他属性...)}]}。
-+ opts.context - 传递给mailbox的上下文信息。
-+ opts.routeContext - （可选）传递给router函数的上下文。
-+ opts.router(routeParam, msg, routeContext, cb) - （可选）rpc消息路由函数。其中，routeParam是路由的相关的参数，对应于rpc代理第一个参数，可以通过这个参数传递请求用户的相关信息，如session; msg是rpc的描述消息; routeContext是opts.routeContext。
-+ opts.mailBoxFactory(serverInfo, opts) - （可选）构建mailbox实例的工厂方法。
+Create an RPC client instance which would generate proxies for the RPC client.
+####Parameters
++ opts.paths - remote service path infos, format: [{namespace: proxy namespace, serverType: remote server type, path: remote service path}]。
++ opts.servers - global server infos, format: {serverType: [{serverId: server id, host: server host, port: server port}]}。
++ opts.context - context for mailbox.
++ opts.routeContext - (optional)context for route function.
++ opts.router(routeParam, msg, routeContext, cb) - (optional) route function which decides the RPC message should be send to which remote server. routeParam: route parameter, msg: RPC descriptioin message, routeContext: opts.routeContext.
++ opts.mailBoxFactory(serverInfo, opts) - (optional) mail box factory method.
 
 ###client.start(cb)
-启动rpc client实例，之后可以通过代理或rpcInvoke方法发起远程调用。
+Start the RPC client.
 
 ###client.stop
-关闭rpc client实例，并停止底层所有mailbox。
+Stop the RPC client and stop all the mail box connections to remote servers.
 
 ###client.rpcInvoke(serverId, msg, cb)
-直接发起rpc调用。
-####参数
-+ serverId - 远程服务器的id。
-+ msg - rpc描述消息，格式：{namespace: 远程服务命名空间, serverType: 远程服务器类型, service: 远程服务名称, method: 远程服务方法名, args: 远程方法调用参数列表}。
-+ cb - 远程服务调用结果回调。
+Invoke an RPC request.
+####Parameters
++ serverId - remote server id.
++ msg - RPC description message. format: {namespace: remote service namespace, serverType: remote server type, service: remote service name, method: remote service method name, args: remote service args}.
++ cb - remote service callback function.
 
 ###MailBox
-负责rpc cliente底层的连接和rpc协议的具体实现。一个mailbox实例对应一个远程服务器。可以通过传入mailBoxFactory来定制自己的mailbox，从而实现不同的rpc协议和策略。
+Implement the low level network communication with remote server. A mail box instance stands for a remote server. Customize the protocol by passing a mailBoxFactory parameter to client to return different mail box instances.
 
 ###mailbox.connect(cb)
-让mailbox实例连接到目标服务器。
+Connect to the remote server.
 
 ###mailbox.close
-关闭mailbox实例。
+Close mail box instance and disconnect with the remote server.
 
 ###mailbox.send(msg, opts, cb)
-让mailbox实例发送rpc消息到关联的远程服务器。
-####参数
-+ msg - rpc描述消息，参考clienet.rpcInvoke。
-+ opts - send操作的附加选项，预留，暂时无用。
-+ cb - rpc回调函数。
+Send the RPC message to the associated remote server.
+####Parameters
++ msg - RPC description message, see also clienet.rpcInvoke.
++ opts - reserved.
++ cb - RPC callback function.
