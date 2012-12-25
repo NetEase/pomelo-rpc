@@ -9,28 +9,19 @@ var paths = [
   {namespace: 'sys', serverType: 'connector', path: __dirname + '../../mock-remote/connector'}
 ];
 
-var servers = {
-  'area': [
-    {id: 'area-servere-1', host: '127.0.0.1',  port: 3333}
-  ],
-  'connector': [
-    {id: 'connector-server-1', host: '127.0.0.1',  port: 4444},
-    {id: 'connector-server-2', host: '127.0.0.1',  port: 5555}
-  ]
-};
-
 var serverList = [
   {id: 'area-server-1', type: "area", host: '127.0.0.1',  port: 3333},
   {id: 'connector-server-1', type: "connector", host: '127.0.0.1',  port: 4444},
   {id: 'connector-server-2', type: "connector", host: '127.0.0.1',  port: 5555},
 ];
 
-var opts = {
-  paths: paths,
-  servers: servers
+var msg = {
+  namespace: 'user',
+  serverType: 'area',
+  service: 'whoAmIRemote',
+  method: 'doService',
+  args: []
 };
-
-var port = 3333;
 
 describe('client', function() {
   var gateways = [];
@@ -38,18 +29,18 @@ describe('client', function() {
   before(function(done) {
     gateways = [];
     //start remote servers
-    for(var type in servers) {
-      var configs = servers[type];
-      for(var i=0; i<configs.length; i++) {
-        var options = {
-          paths: paths,
-          port: configs[i].port,
-          context: {id: configs[i].id}
-        };
-        var gateway = Server.create(options);
-        gateways.push(gateway);
-        gateway.start();
-      }
+    var item, opts, gateway;
+    for(var i=0, l=serverList.length; i<l; i++) {
+      item = serverList[i];
+      opts = {
+        paths: paths,
+        port: item.port,
+        context: {id: item.id}
+      };
+
+      gateway = Server.create(opts);
+      gateways.push(gateway);
+      gateway.start();
     }
     done();
   });
@@ -64,7 +55,7 @@ describe('client', function() {
 
   describe('#create', function() {
     it('should be ok for creating client with an empty opts', function(done) {
-      var client = Client.create(opts);
+      var client = Client.create();
 
       should.exist(client);
 
@@ -76,7 +67,7 @@ describe('client', function() {
     });
 
     it('should add proxy instances by addProxies method', function() {
-      var client = Client.create(opts);
+      var client = Client.create();
 
       should.exist(client);
 
@@ -124,5 +115,59 @@ describe('client', function() {
         done();
       }, WAIT_TIME);
     });
+  });
+
+  describe('#status', function() {
+    it('should return an error if start twice', function(done) {
+      var client = Client.create();
+      client.start(function(err) {
+        should.not.exist(err);
+        client.start(function(err) {
+          should.exist(err);
+          done();
+        });
+      });
+    });
+
+    it('should ignore the later operation if stop twice', function(done) {
+      var client = Client.create();
+      client.start(function(err) {
+        should.not.exist(err);
+        client.stop();
+        client.stop();
+        done();
+      });
+    });
+
+    it('should return an error if try to do rpc invoke when the client not start', function(done) {
+      var client = Client.create();
+      var sid = serverList[0].id;
+
+      client.rpcInvoke(sid, msg, function(err) {
+        should.exist(err);
+        done();
+      });
+    });
+
+    it('should return an error if try to do rpc invoke after the client stop', function(done) {
+      var client = Client.create();
+      var sid = serverList[0].id;
+
+      client.addServer(serverList[0]);
+
+      client.start(function() {
+        client.rpcInvoke(sid, msg, function(err) {
+          should.not.exist(err);
+          client.stop(true);
+          setTimeout(function() {
+            client.rpcInvoke(sid, msg, function(err) {
+              should.exist(err);
+              done();
+            });
+          }, WAIT_TIME);
+        });
+      });
+    });
+
   });
 });

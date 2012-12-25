@@ -10,16 +10,6 @@ var paths = [
   {namespace: 'sys', serverType: 'connector', path: __dirname + '../../mock-remote/connector'}
 ];
 
-var servers = {
-  'area': [
-    {id: 'area-server-1', host: '127.0.0.1',  port: 3333}
-  ],
-  'connector': [
-    {id: 'connector-server-1', host: '127.0.0.1',  port: 4444},
-    {id: 'connector-server-2', host: '127.0.0.1',  port: 5555}
-  ]
-};
-
 var serverList = [
   {id: 'area-server-1', type: "area", host: '127.0.0.1',  port: 3333},
   {id: 'connector-server-1', type: "connector", host: '127.0.0.1',  port: 4444},
@@ -39,19 +29,19 @@ describe('mail station', function() {
 
   before(function(done) {
     gateways = [];
-    //start remote servers
-    for(var type in servers) {
-      var configs = servers[type];
-      for(var i=0; i<configs.length; i++) {
-        var options = {
-          paths: paths,
-          port: configs[i].port,
-          context: {id: configs[i].id}
-        };
-        var gateway = Server.create(options);
+    //start remote logger
+    var item, opts;
+    for(var i=0, l=serverList.length; i<l; i++) {
+      item = serverList[i];
+      opts = {
+        paths: paths,
+        port: item.port,
+        context: {id: item.id}
+      };
+
+      var gateway = Server.create(opts);
         gateways.push(gateway);
         gateway.start();
-      }
     }
     done();
   });
@@ -128,18 +118,20 @@ describe('mail station', function() {
         station.addServer(serverList[i]);
       }
 
+      var func = function(id) {
+        return function(err, remoteId) {
+          should.exist(remoteId);
+          remoteId.should.equal(id);
+          callbackCount++;
+        };
+      };
+
       station.start(function(err) {
         var item;
         for(var i=0, l=serverList.length; i<l; i++) {
           count++;
           item = serverList[i];
-          station.dispatch(item.id, msg, null, (function(id) {
-            return function(err, remoteId) {
-              should.exist(remoteId);
-              remoteId.should.equal(id);
-              callbackCount++;
-            };
-          })(item.id));
+          station.dispatch(item.id, msg, null, func(item.id));
         }
       });
       setTimeout(function() {
@@ -159,18 +151,20 @@ describe('mail station', function() {
         station.addServer(serverList[i]);
       }
 
+      var func = function(id) {
+        return function(err, remoteId) {
+          should.exist(remoteId);
+          remoteId.should.equal(id);
+          callbackCount++;
+        };
+      };
+
       station.start(function(err) {
         var item;
         for(var i=0, l=serverList.length; i<l; i++) {
           count++;
           item = serverList[i];
-          station.dispatch(item.id, msg, null, (function(id) {
-            return function(err, remoteId) {
-              should.exist(remoteId);
-              remoteId.should.equal(id);
-              callbackCount++;
-            };
-          })(item.id));
+          station.dispatch(item.id, msg, null, func(item.id));
         }
       });
       setTimeout(function() {
@@ -181,13 +175,9 @@ describe('mail station', function() {
     });
 
     it('should update the mailbox map by add server after start', function(done) {
-      var opts = {
-        servers: servers,
-        lazyConnect: true
-      };
       var callbackCount = 0;
       var count = 0;
-      var station = MailStation.create(opts);
+      var station = MailStation.create();
       should.exist(station);
 
       for(var i=0, l=serverList.length; i<l; i++) {
@@ -215,13 +205,9 @@ describe('mail station', function() {
       // mock data
       var serverId = 'invalid-server-id';
       var server = {id: serverId, type: 'invalid-server', host: 'localhost', port: 1234};
-      var opts = {
-        servers: servers,
-        lazyConnect: true
-      };
       var callbackCount = 0;
       var eventCount = 0;
-      var station = MailStation.create(opts);
+      var station = MailStation.create();
       should.exist(station);
 
       station.addServer(server);
@@ -254,11 +240,9 @@ describe('mail station', function() {
       var closeEventCount = 0, i, l;
       var remoteIds = [];
       var mailboxIds = [];
-      for(var type in servers) {
-        var configs = servers[type];
-        for(i=0; i<configs.length; i++) {
-          remoteIds.push(configs[i].id);
-        }
+
+      for(i=0, l=serverList.length; i<l; i++) {
+        remoteIds.push(serverList[i].id);
       }
       remoteIds.sort();
 
@@ -269,18 +253,19 @@ describe('mail station', function() {
         station.addServer(serverList[i]);
       }
 
+      var func = function(id) {
+        return function(err, remoteId) {
+          should.exist(remoteId);
+          remoteId.should.equal(id);
+        };
+      };
+
       station.start(function(err) {
         // invoke the lazy connect
-        var item, func;
+        var item;
         for(var i=0, l=serverList.length; i<l; i++) {
           item = serverList[i];
-          func =
-          station.dispatch(item.id, msg, null, (function(id) {
-            return function(err, remoteId) {
-              should.exist(remoteId);
-              remoteId.should.equal(id);
-            };
-          })(item.id));
+          station.dispatch(item.id, msg, null, func(item.id));
         }
 
         station.on('close', function(mailboxId) {
@@ -302,30 +287,30 @@ describe('mail station', function() {
 
     it('should return an error when try to dispatch message by a closed station', function(done) {
       var errorEventCount = 0;
-      var count = 0;
+      var i, l;
 
       var station = MailStation.create();
       should.exist(station);
 
-      for(var i=0, l=serverList.length; i<l; i++) {
+      for(i=0, l=serverList.length; i<l; i++) {
         station.addServer(serverList[i]);
       }
 
+      var func = function(err, remoteId, attach) {
+        should.exist(err);
+        errorEventCount++;
+      };
+
       station.start(function(err) {
         station.stop();
-        for(var type in servers) {
-          var configs = servers[type];
-          for(var i=0; i<configs.length; i++) {
-            count++;
-            station.dispatch(configs[i].id, msg, null, function(err, remoteId, attach) {
-              should.exist(err);
-              errorEventCount++;
-            });
-          }
+        var item;
+        for(i=0, l=serverList.length; i<l; i++) {
+          item = serverList[i];
+          station.dispatch(item.id, msg, null, func);
         }
       });
       setTimeout(function() {
-        errorEventCount.should.equal(count);
+        errorEventCount.should.equal(serverList.length);
         done();
       }, WAIT_TIME);
     });
