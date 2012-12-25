@@ -1,21 +1,21 @@
-SRC = $(shell find lib -type f -name "*.js")
+MOCHA_OPTS=
 TESTS = test/*
-REPORTER = spec
+REPORTER = dot
 TIMEOUT = 5000
 
 test:
-	@./node_modules/.bin/mocha \
-		--reporter $(REPORTER) --timeout $(TIMEOUT) $(TESTS)
+	@NODE_ENV=test ./node_modules/.bin/mocha \
+		--reporter $(REPORTER) --timeout $(TIMEOUT) $(TESTS) \
+		$(MOCHA_OPTS)
 
 test-cov: lib-cov
-	@JSCOV=1 $(MAKE) test REPORTER=html-cov > coverage.html && open coverage.html
+	@POMELO_RPC_COV=1 $(MAKE) test REPORTER=html-cov > coverage.html
 
 lib-cov:
-	@rm -rf ./$@
-	@jscoverage lib $@
+	@jscoverage lib lib-cov
 
 clean:
-	rm -rf lib-cov
 	rm -f coverage.html
+	rm -fr lib-cov
 
-.PHONY: test test-cov
+.PHONY: test clean
