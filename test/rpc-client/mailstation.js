@@ -5,17 +5,20 @@ var Server = require('../../').server;
 
 var WAIT_TIME = 100;
 
-var paths = [
+// proxy records
+var records = [
   {namespace: 'user', serverType: 'area', path: __dirname + '../../mock-remote/area'},
   {namespace: 'sys', serverType: 'connector', path: __dirname + '../../mock-remote/connector'}
 ];
 
+// server info list
 var serverList = [
   {id: 'area-server-1', type: "area", host: '127.0.0.1',  port: 3333},
   {id: 'connector-server-1', type: "connector", host: '127.0.0.1',  port: 4444},
   {id: 'connector-server-2', type: "connector", host: '127.0.0.1',  port: 5555},
 ];
 
+// rpc description message
 var msg = {
   namespace: 'user',
   serverType: 'area',
@@ -34,7 +37,7 @@ describe('mail station', function() {
     for(var i=0, l=serverList.length; i<l; i++) {
       item = serverList[i];
       opts = {
-        paths: paths,
+        paths: records,
         port: item.port,
         context: {id: item.id}
       };

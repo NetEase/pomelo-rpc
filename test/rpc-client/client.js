@@ -4,17 +4,20 @@ var Client = require('../../').client;
 
 var WAIT_TIME = 100;
 
-var paths = [
+// proxy records
+var records = [
   {namespace: 'user', serverType: 'area', path: __dirname + '../../mock-remote/area'},
   {namespace: 'sys', serverType: 'connector', path: __dirname + '../../mock-remote/connector'}
 ];
 
+// server info list
 var serverList = [
   {id: 'area-server-1', type: "area", host: '127.0.0.1',  port: 3333},
   {id: 'connector-server-1', type: "connector", host: '127.0.0.1',  port: 4444},
   {id: 'connector-server-2', type: "connector", host: '127.0.0.1',  port: 5555},
 ];
 
+// rpc description message
 var msg = {
   namespace: 'user',
   serverType: 'area',
@@ -33,7 +36,7 @@ describe('client', function() {
     for(var i=0, l=serverList.length; i<l; i++) {
       item = serverList[i];
       opts = {
-        paths: paths,
+        paths: records,
         port: item.port,
         context: {id: item.id}
       };
@@ -71,11 +74,11 @@ describe('client', function() {
 
       should.exist(client);
 
-      client.addProxies(paths);
+      client.addProxies(records);
 
       var proxies = client.proxies, item;
-      for(var i=0, l=paths.length; i<l; i++) {
-        item = paths[i];
+      for(var i=0, l=records.length; i<l; i++) {
+        item = records[i];
         proxies.should.have.property(item.namespace);
         proxies[item.namespace].should.have.property(item.serverType);
       }
@@ -97,7 +100,7 @@ describe('client', function() {
       };
 
       var client = Client.create(opts);
-      client.addProxies(paths);
+      client.addProxies(records);
       client.addServer(serverList[1]);
 
       client.start(function(err) {
