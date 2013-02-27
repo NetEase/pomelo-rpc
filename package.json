@@ -7,7 +7,8 @@
 		"socket.io-client": ">=0.9.4",
 		"pomelo-loader": "0.0.4",
 		"stream-pkg": "0.0.4",
-		"pomelo-logger": "0.0.2"
+		"pomelo-logger": "0.0.2",
+		"toobusy": "0.2.2"
 	},
 	"devDependencies": {
 		"mocha": ">=0.0.1",
