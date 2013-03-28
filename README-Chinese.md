@@ -1,7 +1,7 @@
 #pomelo-rpc - rpc framework for pomelo
 pomelo-rpc是pomelo项目底层的rpc框架，提供了一个多服务器进程间进行rpc调用的基础设施。
 pomelo-rpc分为客户端和服务器端两个部分。
-客户端部分提供了rpc代理生成，消息路由和网络通讯等功能。
+客户端部分提供了rpc代理生成，消息路由和网络通讯等功能，并支持动态添加代理和远程服务器配置。
 服务器端提供了远程服务暴露，请求派发，网络通讯等功能。
 
 远程服务代码加载由pomelo-loader模块完成，相关规则可以参考https://github.com/node-pomelo/pomelo-loader
@@ -20,9 +20,9 @@ var Server = require('pomelo-rpc').server;
 
 // remote service path info list
 var paths = [
-  {namespace: 'user', path: __dirname + '../../mock-remote/area'},
-  {namespace: 'sys', path: __dirname + '../../mock-remote/connector'}
+  {namespace: 'user', path: __dirname + '/remote/test'}
 ];
+
 var port = 3333;
 
 var server = Server.create({paths: paths, port: port});
@@ -35,26 +35,40 @@ console.log('rpc server started.');
 var Client = require('pomelo-rpc').client;
 
 // remote service interface path info list
-var paths = [
-  {namespace: 'user', serverType: 'area', path: __dirname + '../../mock-remote/area'},
-  {namespace: 'sys', serverType: 'connector', path: __dirname + '../../mock-remote/connector'}
+var records = [
+  {namespace: 'user', serverType: 'test', path: __dirname + '/remote/test'}
 ];
 
-// global server info list
-var servers = {
-  'area': [
-    {id: 'area-servere-1', host: '127.0.0.1',  port: 3333}
-  ],
-  'connector': [
-    {id: 'connector-server-1', host: '127.0.0.1',  port: 4444},
-    {id: 'connector-server-2', host: '127.0.0.1',  port: 5555}
-  ]
+// server info list
+var servers = [
+  {id: 'test-server-1', serverType: 'test', host: '127.0.0.1', port: 3333}
+];
+
+// route parameter passed to route function
+var routeParam = null;
+
+// route context passed to route function
+var routeContext = servers;
+
+// route function to caculate the remote server id
+var routeFunc = function(routeParam, msg, routeContext, cb) {
+  cb(null, routeContext[0].id);
 };
 
-var client = Client.create({paths: paths, servers: servers}});
+var client = Client.create({routeContext: routeContext, router: routeFunc});
 
 client.start(function(err) {
   console.log('rpc client start ok.');
+
+  client.addProxies(records);
+  client.addServers(servers);
+
+  client.proxies.user.test.service.echo(routeParam, 'hello', function(err, resp) {
+    if(err) {
+      console.error(err.stack);
+    }
+    console.log(resp);
+  });
 });
 ```
 
@@ -86,12 +100,20 @@ client.start(function(err) {
 ###Client.create(opts)
 创建一个rpc client实例。根据配置生成代理。
 ####参数
-+ opts.paths - 被代理的远程服务信息列表，结构：[{namespace: 代理的名字空间, serverType: 远程服务器的类型, path: 远程接口的目录}]。
-+ opts.servers - 全局服务器信息，结构：{serverType: [{serverId: 服务器id, host: 服务器host, port: 服务器端口(, 其他属性...)}]}。
 + opts.context - 传递给mailbox的上下文信息。
 + opts.routeContext - （可选）传递给router函数的上下文。
 + opts.router(routeParam, msg, routeContext, cb) - （可选）rpc消息路由函数。其中，routeParam是路由的相关的参数，对应于rpc代理第一个参数，可以通过这个参数传递请求用户的相关信息，如session; msg是rpc的描述消息; routeContext是opts.routeContext。
 + opts.mailBoxFactory(serverInfo, opts) - （可选）构建mailbox实例的工厂方法。
+
+###client.addProxies(records)
+加载新的代理代码。
+####参数
++ records - 代理代码的配置信息列表。格式：[{namespace: service_name_space, serverType: remote_server_type, path: path_to_remote_service_interfaces}];
+
+###client.addServers(servers)
+添加新的远程服务器配置信息。
+####参数
++ servers - 远程服务器信息列表。格式：[{id: remote_server_id, serverType: remote_server_type, host: remote_server_host, port: remote_server_port}]
 
 ###client.start(cb)
 启动rpc client实例，之后可以通过代理或rpcInvoke方法发起远程调用。

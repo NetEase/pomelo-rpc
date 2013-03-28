@@ -2,7 +2,7 @@
 
 pomelo-rpc is the low level RPC framework for pomelo project. It contains two parts: client and server.
 
-The client part generates the RPC client proxy, routes the message to the appropriate remote server and manages the network communications.
+The client part generates the RPC client proxy, routes the message to the appropriate remote server and manages the network communications. Support add proxies and remote server information dynamically.
 
 The server part exports the remote services, dispatches the remote requests to the services and also manages the network communications.
 
@@ -22,9 +22,9 @@ var Server = require('pomelo-rpc').server;
 
 // remote service path info list
 var paths = [
-  {namespace: 'user', path: __dirname + '../../mock-remote/area'},
-  {namespace: 'sys', path: __dirname + '../../mock-remote/connector'}
+  {namespace: 'user', path: __dirname + '/remote/test'}
 ];
+
 var port = 3333;
 
 var server = Server.create({paths: paths, port: port});
@@ -37,26 +37,40 @@ console.log('rpc server started.');
 var Client = require('pomelo-rpc').client;
 
 // remote service interface path info list
-var paths = [
-  {namespace: 'user', serverType: 'area', path: __dirname + '../../mock-remote/area'},
-  {namespace: 'sys', serverType: 'connector', path: __dirname + '../../mock-remote/connector'}
+var records = [
+  {namespace: 'user', serverType: 'test', path: __dirname + '/remote/test'}
 ];
 
-// global server info list
-var servers = {
-  'area': [
-    {id: 'area-servere-1', host: '127.0.0.1',  port: 3333}
-  ],
-  'connector': [
-    {id: 'connector-server-1', host: '127.0.0.1',  port: 4444},
-    {id: 'connector-server-2', host: '127.0.0.1',  port: 5555}
-  ]
+// server info list
+var servers = [
+  {id: 'test-server-1', serverType: 'test', host: '127.0.0.1', port: 3333}
+];
+
+// route parameter passed to route function
+var routeParam = null;
+
+// route context passed to route function
+var routeContext = servers;
+
+// route function to caculate the remote server id
+var routeFunc = function(routeParam, msg, routeContext, cb) {
+  cb(null, routeContext[0].id);
 };
 
-var client = Client.create({paths: paths, servers: servers}});
+var client = Client.create({routeContext: routeContext, router: routeFunc});
 
 client.start(function(err) {
   console.log('rpc client start ok.');
+
+  client.addProxies(records);
+  client.addServers(servers);
+
+  client.proxies.user.test.service.echo(routeParam, 'hello', function(err, resp) {
+    if(err) {
+      console.error(err.stack);
+    }
+    console.log(resp);
+  });
 });
 ```
 
@@ -88,12 +102,20 @@ Stop the acceptor.
 ###Client.create(opts)
 Create an RPC client instance which would generate proxies for the RPC client.
 ####Parameters
-+ opts.paths - remote service path infos, format: [{namespace: proxy namespace, serverType: remote server type, path: remote service path}].
-+ opts.servers - global server infos, format: {serverType: [{serverId: server id, host: server host, port: server port}]}.
 + opts.context - context for mailbox.
 + opts.routeContext - (optional)context for route function.
 + opts.router(routeParam, msg, routeContext, cb) - (optional) route function which decides the RPC message should be send to which remote server. routeParam: route parameter, msg: RPC descriptioin message, routeContext: opts.routeContext.
 + opts.mailBoxFactory(serverInfo, opts) - (optional) mail box factory method.
+
+###client.addProxies(records)
+Load new proxy codes.
+####Parameters
++ records - new proxy code configure information list。Format: [{namespace: service_name_space, serverType: remote_server_type, path: path_to_remote_service_interfaces}];
+
+###client.addServers(servers)
+Add new remote server informations.
+####Parameters
++ servers - remote server information list. Format: [{id: remote_server_id, serverType: remote_server_type, host: remote_server_host, port: remote_server_port}]
 
 ###client.start(cb)
 Start the RPC client.
