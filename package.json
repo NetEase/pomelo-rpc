@@ -8,7 +8,8 @@
 		"pomelo-loader": "0.0.4",
 		"stream-pkg": "0.0.5",
 		"pomelo-logger": "0.0.3",
-		"toobusy": "0.2.2"
+		"toobusy": "0.2.2",
+		"node-uuid": "1.4.0"
 	},
 	"devDependencies": {
 		"mocha": ">=0.0.1",
