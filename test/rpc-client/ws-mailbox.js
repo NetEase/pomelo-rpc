@@ -35,7 +35,7 @@ describe('ws mailbox test', function() {
       acceptorFactory: Server.WSAcceptor,
       paths: paths,
       port: port,
-      cacheMsg: true,
+      bufferMsg: true,
       interval: 30
     };
 
@@ -174,7 +174,7 @@ describe('ws mailbox test', function() {
       };
       var callbackCount = 0;
 
-      var mailbox = Mailbox.create(server, {cacheMsg: true});
+      var mailbox = Mailbox.create(server, {bufferMsg: true});
       mailbox.connect(function(err) {
         should.not.exist(err);
 
@@ -240,7 +240,7 @@ describe('ws mailbox test', function() {
       };
       var callbackCount = 0;
 
-      var mailbox = Mailbox.create(server, {cacheMsg: true});
+      var mailbox = Mailbox.create(server, {bufferMsg: true});
       mailbox.connect(function(err) {
         should.not.exist(err);
 
