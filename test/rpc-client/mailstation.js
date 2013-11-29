@@ -2,6 +2,7 @@ var lib = process.env.POMELO_RPC_COV ? 'lib-cov' : 'lib';
 var MailStation = require('../../' + lib + '/rpc-client/mailstation');
 var should = require('should');
 var Server = require('../../').server;
+var Tracer = require('../../lib/util/tracer');
 
 var WAIT_TIME = 100;
 
@@ -128,13 +129,14 @@ describe('mail station', function() {
           callbackCount++;
         };
       };
+      var tracer = new Tracer(null, false); 
 
       station.start(function(err) {
         var item;
         for(var i=0, l=serverList.length; i<l; i++) {
           count++;
           item = serverList[i];
-          station.dispatch(item.id, msg, null, func(item.id));
+          station.dispatch(tracer, item.id, msg, null, func(item.id));
         }
       });
       setTimeout(function() {
@@ -162,12 +164,14 @@ describe('mail station', function() {
         };
       };
 
+      var tracer = new Tracer(null, false); 
+
       station.start(function(err) {
         var item;
         for(var i=0, l=serverList.length; i<l; i++) {
           count++;
           item = serverList[i];
-          station.dispatch(item.id, msg, null, func(item.id));
+          station.dispatch(tracer, item.id, msg, null, func(item.id));
         }
       });
       setTimeout(function() {
@@ -187,11 +191,13 @@ describe('mail station', function() {
         station.addServer(serverList[i]);
       }
 
+      var tracer = new Tracer(null, false); 
+
       station.start(function(err) {
         // add area server
         var item = serverList[0];
         station.addServer(item);
-        station.dispatch(item.id, msg, null, function(err, remoteId) {
+        station.dispatch(tracer, item.id, msg, null, function(err, remoteId) {
           should.exist(remoteId);
           remoteId.should.equal(item.id);
           callbackCount++;
@@ -221,9 +227,11 @@ describe('mail station', function() {
         eventCount++;
       });
 
+      var tracer = new Tracer(null, false); 
+
       station.start(function(err) {
         should.exist(station);
-        station.dispatch(serverId, msg, null, function(err) {
+        station.dispatch(tracer, serverId, msg, null, function(err) {
           should.exist(err);
           'message was forward to blackhole.'.should.equal(err.message);
           callbackCount++;
@@ -263,12 +271,14 @@ describe('mail station', function() {
         };
       };
 
+      var tracer = new Tracer(null, false); 
+
       station.start(function(err) {
         // invoke the lazy connect
         var item;
         for(var i=0, l=serverList.length; i<l; i++) {
           item = serverList[i];
-          station.dispatch(item.id, msg, null, func(item.id));
+          station.dispatch(tracer, item.id, msg, null, func(item.id));
         }
 
         station.on('close', function(mailboxId) {
@@ -304,12 +314,14 @@ describe('mail station', function() {
         errorEventCount++;
       };
 
+      var tracer = new Tracer(null, false); 
+
       station.start(function(err) {
         station.stop();
         var item;
         for(i=0, l=serverList.length; i<l; i++) {
           item = serverList[i];
-          station.dispatch(item.id, msg, null, func);
+          station.dispatch(tracer, item.id, msg, null, func);
         }
       });
       setTimeout(function() {
@@ -326,13 +338,14 @@ describe('mail station', function() {
       var sid = 'connector-server-1';
       var orgMsg = msg;
       var orgOpts = {something: 'hello'};
-
       var station = MailStation.create();
       should.exist(station);
 
       for(var i=0, l=serverList.length; i<l; i++) {
         station.addServer(serverList[i]);
       }
+
+      var tracer = new Tracer(null, false); 
 
       station.start(function(err) {
         station.before(function(fsid, fmsg, fopts, next) {
@@ -375,7 +388,7 @@ describe('mail station', function() {
           next(fsid, fmsg, fopts);
         });
 
-        station.dispatch(sid, orgMsg, orgOpts, function() {});
+        station.dispatch(tracer, sid, orgMsg, orgOpts, function() {});
       });
 
       setTimeout(function() {

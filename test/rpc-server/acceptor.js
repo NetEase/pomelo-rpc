@@ -13,7 +13,7 @@ describe('acceptor', function() {
     it('should be ok when listen a valid port and emit a closed event when it closed', function(done) {
       var errorCount = 0;
       var closeCount = 0;
-      var acceptor = Acceptor.create(null, function(msg, cb) {});
+      var acceptor = Acceptor.create(null, function(tracer, msg, cb) {});
 
       should.exist(acceptor);
       acceptor.on('error', function(err) {
@@ -35,7 +35,7 @@ describe('acceptor', function() {
 
     it('should emit an error when listen a port in use', function(done) {
       var errorCount = 0;
-      var acceptor = Acceptor.create(null, function(msg, cb) {});
+      var acceptor = Acceptor.create(null, function(tracer, msg, cb) {});
 
       should.exist(acceptor);
       acceptor.on('error', function(err) {
@@ -63,7 +63,7 @@ describe('acceptor', function() {
         args: [1, 'a', {param: 100}]
       };
 
-      var acceptor = Acceptor.create(null, function(msg, cb) {
+      var acceptor = Acceptor.create(null, function(tracer, msg, cb) {
         msg.should.eql(orgMsg);
         callbackCount++;
         cb(msg);
@@ -103,7 +103,7 @@ describe('acceptor', function() {
         args: [2, 'a', {param: 100}]
       };
 
-      var acceptor = Acceptor.create(null, function(msg, cb) {
+      var acceptor = Acceptor.create(null, function(tracer, msg, cb) {
         callbackCount++;
         cb(msg);
       });
