@@ -22,7 +22,7 @@ var routeFunc = function(routeParam, msg, routeContext, cb) {
   cb(null, routeContext[0].id);
 };
 
-var client = Client.create({routeContext: routeContext, router: routeFunc});
+var client = Client.create({routeContext: routeContext, router: routeFunc, context: {serverId: 'test-server-1'}});
 
 client.start(function(err) {
   console.log('rpc client start ok.');
