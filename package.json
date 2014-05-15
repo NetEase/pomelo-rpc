@@ -1,6 +1,6 @@
 {
 	"name": "pomelo-rpc",
-	"version": "0.3.3",
+	"version": "0.4.0",
 	"dependencies": {
 		"socket.io": "0.9.16",
 		"crc": "0.2.0",
@@ -9,7 +9,8 @@
 		"stream-pkg": "0.0.5",
 		"pomelo-logger": "0.1.2",
 		"toobusy": "0.2.2",
-		"node-uuid": "1.4.0"
+		"node-uuid": "1.4.0",
+		"async": "0.2.10"
 	},
 	"devDependencies": {
 		"mocha": ">=0.0.1",
