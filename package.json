@@ -1,6 +1,6 @@
 {
 	"name": "pomelo-rpc",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"dependencies": {
 		"socket.io": "0.9.16",
 		"crc": "0.2.0",
