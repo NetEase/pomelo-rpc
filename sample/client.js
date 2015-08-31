@@ -37,6 +37,13 @@ client.start(function(err) {
     if(err) {
       console.error(err.stack);
     }
-    console.log(resp);
+
+    setTimeout(function() {
+      console.log(resp1);
+    }, 1000);
   });
+});
+
+process.on('uncaughtException', function(err) {
+  console.error(err);
 });
