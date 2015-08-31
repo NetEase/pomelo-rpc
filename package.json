@@ -1,6 +1,6 @@
 {
 	"name": "pomelo-rpc",
-	"version": "0.5.3",
+	"version": "0.5.4",
 	"dependencies": {
 		"mqtt-connection": "git+ssh://gitlab@gitlab.hz.netease.com:1046/bearcat/mqtt-connection.git#bearcat",
 		"crc": "0.2.0",
