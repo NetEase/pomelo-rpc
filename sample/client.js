@@ -31,7 +31,7 @@ client.start(function(err) {
   console.log('rpc client start ok.');
 
   client.addProxies(records);
-  client.addServers(servers);
+  client.replaceServers(servers);
 
   client.proxies.user.test.service.echo(routeParam, 'hello', function(err, resp) {
     if(err) {
