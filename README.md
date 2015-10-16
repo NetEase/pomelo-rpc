@@ -112,11 +112,6 @@ Load new proxy codes.
 ####Parameters
 + records - new proxy code configure information list。Format: [{namespace: service_name_space, serverType: remote_server_type, path: path_to_remote_service_interfaces}];
 
-###client.addServers(servers)
-Add new remote server informations.
-####Parameters
-+ servers - remote server information list. Format: [{id: remote_server_id, serverType: remote_server_type, host: remote_server_host, port: remote_server_port}]
-
 ###client.start(cb)
 Start the RPC client.
 
