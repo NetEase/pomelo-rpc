@@ -1,5 +1,7 @@
 var Server = require('..').server;
+var config = require('./config.json');
 
+var acceptorName = config.protocol || 'tcp';
 // remote service path info list
 var paths = [
   {namespace: 'user', path: __dirname + '/remote/test'}
@@ -7,6 +9,6 @@ var paths = [
 
 var port = 3333;
 
-var server = Server.create({paths: paths, port: port});
+var server = Server.create({paths: paths, port: port, acceptorName: 'ws'});
 server.start();
 console.log('rpc server started.');

@@ -1,0 +1,6 @@
+{
+    "protocol": "ws",
+    "host": "127.0.0.1",
+    "interval": 1000,
+    "msg": "hello:123456789"
+}
