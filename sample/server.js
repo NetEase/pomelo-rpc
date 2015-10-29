@@ -9,6 +9,6 @@ var paths = [
 
 var port = config.port || 8080;
 
-var server = Server.create({paths: paths, port: port, acceptorName: 'ws'});
+var server = Server.create({paths: paths, port: port, acceptorName: acceptorName});
 server.start();
 console.log('rpc server started.');
