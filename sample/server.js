@@ -7,7 +7,7 @@ var paths = [
   {namespace: 'user', path: __dirname + '/remote/test'}
 ];
 
-var port = 3333;
+var port = config.port || 8080;
 
 var server = Server.create({paths: paths, port: port, acceptorName: 'ws'});
 server.start();

@@ -6,6 +6,7 @@ var mailboxName = config.protocol || 'tcp';
 var period = config.interval;  //ms
 var msg = config.msg;
 var host = config.host || '127.0.0.1';
+var port = config.port || 8080;
 
 // remote service interface path info list
 var records = [
@@ -18,7 +19,7 @@ var context = {
 
 // server info list
 var servers = [
-  {id: 'test-server-1', serverType: 'test', host: host, port: 3333}
+  {id: 'test-server-1', serverType: 'test', host: host, port: port}
 ];
 
 // route parameter passed to route function

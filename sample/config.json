@@ -1,6 +1,7 @@
 {
     "protocol": "ws",
     "host": "127.0.0.1",
+    "port": "8080",
     "interval": 1000,
     "msg": "hello:123456789"
 }
