@@ -5,7 +5,7 @@ module.exports = function(context) {
 		echo: function(msg, cb) {
 			// setTimeout(function() {
 				cb(null, msg);
-			// }, 1000);
+			// }, 15000);
 		}
 	};
 };

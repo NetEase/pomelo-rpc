@@ -33,14 +33,26 @@ client.start(function(err) {
   client.addProxies(records);
   client.addServers(servers);
 
-  client.proxies.user.test.service.echo(routeParam, 'hello', function(err, resp) {
+  var m = new Buffer('hello');
+  n = 'bbb';
+  // m = 3.14;
+  // m = 'aaa';
+  // m = 100325;
+  // m = {a: '111', b: 'bbb', c: 'ccc'};
+  // m = [1, '2', {a: 'bbb'}, 3.12, m, false];
+  // m = false;
+  // m = '0';
+
+  client.proxies.user.test.service.echo(routeParam, m, function(err, resp) {
     if(err) {
       console.error(err.stack);
     }
 
-    setTimeout(function() {
-      console.log(resp1);
-    }, 1000);
+    // setTimeout(function() {
+      console.log(resp);
+      // console.log(typeof resp)
+      // console.log(resp.toString())
+    // }, 1000);
   });
 });
 

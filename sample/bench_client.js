@@ -52,7 +52,7 @@ var times = 0;
 var mock_data_1 = 'hello';
 var mock_data_2 = 'hello';
 
-var num_repeat = 800; // 100 200 300 400 800
+var num_repeat = 200; // 100 200 300 400 800
 
 for (var i = 0; i < num_repeat; i++) {
   mock_data_2 += mock_data_1;
@@ -64,7 +64,7 @@ var mock_data_3 = {
   time: Date.now()
 }
 
-var payload = mock_data_2;
+var payload = "";
 
 console.log(new Buffer(payload).length / 1024 + 'k');
 // console.log(new Buffer(JSON.stringify(payload)).length / 1024 + 'k');
@@ -80,12 +80,13 @@ function run() {
     console.log('run %d num requests cost: %d ops/sec', num_requests, cost, (num_requests / (cost / 1000)).toFixed(2));
     times = 0;
     start = now;
+    // return;
     return run();
   }
 
   times++;
   rpcRequest(payload, function() {
-    run();
+      run();
   });
 }
 
