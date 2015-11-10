@@ -8,7 +8,8 @@
 		"stream-pkg": "0.0.5",
 		"pomelo-logger": "0.1.7",
 		"node-uuid": "1.4.0",
-		"async": "^1.3.0"
+		"async": "^1.3.0",
+		"bearcat-buffer": "git+ssh://git@g.hz.netease.com:22222/bearcat/bearcat-buffer.git"
 	},
 	"devDependencies": {
 		"mocha": ">=0.0.1",
