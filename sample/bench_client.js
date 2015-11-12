@@ -64,7 +64,7 @@ var mock_data_3 = {
   time: Date.now()
 }
 
-var payload = "";
+var payload = mock_data_2;
 
 console.log(new Buffer(payload).length / 1024 + 'k');
 // console.log(new Buffer(JSON.stringify(payload)).length / 1024 + 'k');
