@@ -12,3 +12,7 @@ var port = config.port || 8080;
 var server = Server.create({paths: paths, port: port, acceptorName: acceptorName});
 server.start();
 console.log('rpc server started.');
+
+process.on('uncaughtException', function (err) {
+        console.error('Caught exception: ', err.stack);
+});
