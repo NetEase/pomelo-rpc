@@ -41,8 +41,10 @@ client.start(function(err) {
   client.addProxies(records);
   client.replaceServers(servers);
 
+  var id = 0;
+
   var func = function(){
-    client.proxies.user.test.service.echo(routeParam, msg, function(err, resp) {
+    client.proxies.user.test.service.echo(routeParam, msg[Math.round(Math.random()*(10-1))] + '::' + id++, function(err, resp) {
       if(err) {
         console.error(err.stack);
       }
