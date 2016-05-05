@@ -50,6 +50,7 @@ client.start(function(err) {
       }
       console.log(resp);
     });
+    client.proxies.user.test.service.onlynotify(routeParam, msg[Math.round(Math.random()*(10-1))] + '::' + id++);
   }
 
   setInterval(func, period);
