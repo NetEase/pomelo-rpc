@@ -2,7 +2,7 @@
 	"name": "pomelo-rpc",
 	"version": "1.0.2",
 	"dependencies": {
-		"ws": "0.8.0",
+		"ws": "^0.8.0",
 		"crc": "0.2.0",
 		"pomelo-loader": "0.0.6",
 		"pomelo-logger": "0.1.7",
