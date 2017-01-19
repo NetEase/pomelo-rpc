@@ -47,7 +47,7 @@ client.start(function(err) {
   run();
 });
 
-var num_requests = 20000;
+var num_requests = 100000;
 var times = 0;
 var mock_data_1 = 'hello';
 var mock_data_2 = 'hello';
@@ -60,14 +60,14 @@ for (var i = 0; i < num_repeat; i++) {
 
 var mock_data_3 = {
   a: 'run',
-  b: mock_data_2,
+  b: mock_data_2 + Date.now() + '_',
   time: Date.now()
 }
 
-var payload = mock_data_2;
+var payload = mock_data_3;
 
-console.log(new Buffer(payload).length / 1024 + 'k');
-// console.log(new Buffer(JSON.stringify(payload)).length / 1024 + 'k');
+// console.log(new Buffer(payload).length / 1024 + 'k');
+console.log(new Buffer(JSON.stringify(payload)).length / 1024 + 'k');
 
 function run() {
   if (times > num_requests) {
@@ -91,7 +91,7 @@ function run() {
 }
 
 function rpcRequest(param, cb) {
-  client.proxies.user.test.service.echo(routeParam, param, function(err, resp) {
+  client.proxies.user.test.service.echo(routeParam, param, 123, function(err, resp) {
     if (err) {
       console.error(err.stack);
     }

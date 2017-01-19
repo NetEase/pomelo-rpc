@@ -34,7 +34,15 @@ client.start(function(err) {
   client.addServers(servers);
 
   var m = new Buffer('hello');
-  n = 'bbb';
+  // n = 'bbb';
+  var fs = require('fs')
+  // m = fs.readFileSync('./skill.js').toString();
+  m = [ 'onReloadSkill',
+     // [ m ],
+     [ '210108' ],
+     { type: 'push', userOptions: {}, isPush: true } ] ;
+  // m = ['route', [m], {}, {}];
+  // m = require('./test');
   // m = 3.14;
   // m = 'aaa';
   // m = 100325;
@@ -43,13 +51,15 @@ client.start(function(err) {
   // m = false;
   // m = '0';
 
-  client.proxies.user.test.service.echo(routeParam, m, function(err, resp) {
+  client.proxies.user.test.service.echo.toServer('test-server-1', m, 'aaa', function(err, resp, data) {
+  // client.proxies.user.test.service.echo(routeParam, m, 'aaa', function(err, resp, data) {
     if(err) {
       console.error(err.stack);
     }
 
     // setTimeout(function() {
       console.log(resp);
+      console.log(data);
       // console.log(typeof resp)
       // console.log(resp.toString())
     // }, 1000);
