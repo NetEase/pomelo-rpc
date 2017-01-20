@@ -1,6 +1,6 @@
 {
 	"name": "pomelo-rpc",
-	"version": "1.0.0",
+	"version": "1.0.7",
 	"dependencies": {
 		"mqtt-connection": "3.0.0",
 		"crc": "0.2.0",
