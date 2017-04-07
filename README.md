@@ -1,4 +1,4 @@
-#pomelo-rpc - rpc framework for pomelo
+# pomelo-rpc - rpc framework for pomelo  
 
 pomelo-rpc is the low level RPC framework for pomelo project. It contains two parts: client and server.
 
@@ -10,13 +10,13 @@ And the remote service codes would loaded by pomelo-loader module and more detai
 
 + Tags: node.js
 
-##Installation
+## Installation
 ```
 npm install pomelo-rpc
 ```
 
-##Usage
-###Server
+## Usage
+### Server
 ``` javascript
 var Server = require('pomelo-rpc').server;
 
@@ -32,7 +32,7 @@ server.start();
 console.log('rpc server started.');
 ```
 
-###Client
+### Client
 ``` javascript
 var Client = require('pomelo-rpc').client;
 
@@ -74,74 +74,74 @@ client.start(function(err) {
 });
 ```
 
-##Server API
-###Server.create(opts)
+## Server API
+### Server.create(opts)
 Create a RPC server instance. Intitiate the instance and acceptor with the configure.
-###Parameters
+### Parameters
 + opts.port - rpc server listening port.
 + opts.paths - remote service path infos, format: [{namespace: remote service namespace, path: remote service path}, ...].
 + opts.context - remote service context.
 + opts.acceptorFactory(opts, msgCB) - (optional) acceptor factory method. opts.port：port that acceptor would listen，opts.services：loaded remote services，format: {namespace: {name: service}}. msgCB(msg, cb): remote request arrived callback. the method should return a acceptor instance.
 
-###server.start
+### server.start
 Start the remote server instance.
 
-###server.stop
+### server.stop
 Stop the remote server instance and the acceptor.
 
-###Acceptor
+### Acceptor
 Implement the low level network communication with specified protocol. Customize the protocol by passing an acceptorFactory to return different acceptors.
 
-###acceptor.listen(port)
+### acceptor.listen(port)
 Listen the specified port.
 
-###acceptor.close
+### acceptor.close
 Stop the acceptor.
 
-##Client API
-###Client.create(opts)
+## Client API
+### Client.create(opts)
 Create an RPC client instance which would generate proxies for the RPC client.
-####Parameters
+#### Parameters
 + opts.context - context for mailbox.
 + opts.routeContext - (optional)context for route function.
 + opts.router(routeParam, msg, routeContext, cb) - (optional) route function which decides the RPC message should be send to which remote server. routeParam: route parameter, msg: RPC descriptioin message, routeContext: opts.routeContext.
 + opts.mailBoxFactory(serverInfo, opts) - (optional) mail box factory method.
 
-###client.addProxies(records)
+### client.addProxies(records)
 Load new proxy codes.
-####Parameters
+#### Parameters
 + records - new proxy code configure information list。Format: [{namespace: service_name_space, serverType: remote_server_type, path: path_to_remote_service_interfaces}];
 
-###client.addServers(servers)
+### client.addServers(servers)
 Add new remote server informations.
-####Parameters
+#### Parameters
 + servers - remote server information list. Format: [{id: remote_server_id, serverType: remote_server_type, host: remote_server_host, port: remote_server_port}]
 
-###client.start(cb)
+### client.start(cb)
 Start the RPC client.
 
-###client.stop
+### client.stop
 Stop the RPC client and stop all the mail box connections to remote servers.
 
-###client.rpcInvoke(serverId, msg, cb)
+### client.rpcInvoke(serverId, msg, cb)
 Invoke an RPC request.
-####Parameters
+#### Parameters
 + serverId - remote server id.
 + msg - RPC description message. format: {namespace: remote service namespace, serverType: remote server type, service: remote service name, method: remote service method name, args: remote service args}.
 + cb - remote service callback function.
 
-###MailBox
+### MailBox
 Implement the low level network communication with remote server. A mail box instance stands for a remote server. Customize the protocol by passing a mailBoxFactory parameter to client to return different mail box instances.
 
-###mailbox.connect(cb)
+### mailbox.connect(cb)
 Connect to the remote server.
 
-###mailbox.close
+### mailbox.close
 Close mail box instance and disconnect with the remote server.
 
-###mailbox.send(msg, opts, cb)
+### mailbox.send(msg, opts, cb)
 Send the RPC message to the associated remote server.
-####Parameters
+#### Parameters
 + msg - RPC description message, see also clienet.rpcInvoke.
 + opts - reserved.
 + cb - RPC callback function.
