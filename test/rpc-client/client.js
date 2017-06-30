@@ -6,8 +6,8 @@ var WAIT_TIME = 100;
 
 // proxy records
 var records = [
-  {namespace: 'user', serverType: 'area', path: __dirname + '../../mock-remote/area'},
-  {namespace: 'sys', serverType: 'connector', path: __dirname + '../../mock-remote/connector'}
+  {namespace: 'user', serverType: 'area', path: __dirname + '/../mock-remote/area'},
+  {namespace: 'sys', serverType: 'connector', path: __dirname + '/../mock-remote/connector'}
 ];
 
 // server info list
