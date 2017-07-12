@@ -1,4 +1,5 @@
 .project
+.idea
 node_modules/
 coverage.html
 lib-cov/

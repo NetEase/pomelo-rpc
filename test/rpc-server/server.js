@@ -4,8 +4,8 @@ var should = require('should');
 var WAIT_TIME = 100;
 
 var paths = [
-  {namespace: 'user', path: __dirname + '../../mock-remote/area'},
-  {namespace: 'sys', path: __dirname + '../../mock-remote/connector'}
+  {namespace: 'user', path: __dirname + '/../mock-remote/area'},
+  {namespace: 'sys', path: __dirname + '/../mock-remote/connector'}
 ];
 
 var port = 3333;
